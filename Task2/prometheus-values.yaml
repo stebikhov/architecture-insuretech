@@ -1,0 +1,28 @@
+# Из состава чарта исключены компоненты, не требуемые для задачи (Alertmanager,
+# Pushgateway), чтобы не создавать избыточные объекты в кластере.
+alertmanager:
+  enabled: false
+
+kube-state-metrics:
+  enabled: false
+
+prometheus-node-exporter:
+  enabled: false
+
+prometheus-pushgateway:
+  enabled: false
+
+server:
+  persistentVolume:
+    enabled: false
+  retention: "6h"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  service:
+    type: NodePort
+    nodePort: 30090

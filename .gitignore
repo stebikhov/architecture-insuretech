@@ -1,0 +1,48 @@
+# Учебные материалы и исходные данные
+.data/
+
+# Байткод Python и кэш интерпретатора
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Виртуальные окружения Python
+.venv/
+venv/
+env/
+ENV/
+
+# Логи и отладочные файлы (за исключением журналов верификации Задания 2)
+*.log
+!Task2/scaling-evidence*.log
+
+# Временные файлы и резервные копии редакторов
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+.~*.drawio.bkp
+*.drawio.bkp
+*.drawio.dtmp
+
+# Конфигурационные файлы сред разработки (IDE)
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Служебные файлы операционных систем
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
