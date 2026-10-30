@@ -1,0 +1,108 @@
+﻿=== Итоговый лог динамического масштабирования HPA по памяти ===
+Дата проверки: 2026-09-26 11:54:10
+
+=== kubectl get hpa scaletestapp-hpa (финальное состояние после спада нагрузки) ===
+NAME               REFERENCE                 TARGETS          MINPODS   MAXPODS   REPLICAS   AGE
+scaletestapp-hpa   Deployment/scaletestapp   memory: 5%/80%   1         10        1          24m
+
+
+=== kubectl describe hpa scaletestapp-hpa ===
+Name:                                                     scaletestapp-hpa
+Namespace:                                                default
+Labels:                                                   <none>
+Annotations:                                              <none>
+CreationTimestamp:                                        Sat, 26 Sep 2026 11:29:48 +0300
+Reference:                                                Deployment/scaletestapp
+Metrics:                                                  ( current / target )
+  resource memory on pods  (as a percentage of request):  5% (1628Ki) / 80%
+Min replicas:                                             1
+Max replicas:                                             10
+Deployment pods:                                          1 current / 1 desired
+Conditions:
+  Type            Status  Reason              Message
+  ----            ------  ------              -------
+  AbleToScale     True    ReadyForNewScale    recommended size matches current size
+  ScalingActive   True    ValidMetricFound    the HPA was able to successfully calculate a replica count from memory resource utilization (percentage of request)
+  ScalingLimited  False   DesiredWithinRange  the desired count is within the acceptable range
+Events:
+  Type     Reason                        Age                From                       Message
+  ----     ------                        ----               ----                       -------
+  Warning  FailedGetResourceMetric       22m (x6 over 24m)  horizontal-pod-autoscaler  failed to get memory utilization: unable to get metrics for resource memory: no metrics returned from resource metrics API
+  Warning  FailedComputeMetricsReplicas  22m (x6 over 24m)  horizontal-pod-autoscaler  invalid metrics (1 invalid out of 1), first error is: failed to get memory resource metric value: failed to get memory utilization: unable to get metrics for resource memory: no metrics returned from resource metrics API
+  Normal   SuccessfulRescale             8m52s              horizontal-pod-autoscaler  New size: 2; reason: memory resource utilization (percentage of request) above target
+  Normal   SuccessfulRescale             2m7s               horizontal-pod-autoscaler  New size: 1; reason: All metrics below target
+
+
+=== kubectl get pods -l app=scaletestapp -o wide ===
+NAME                            READY   STATUS    RESTARTS   AGE     IP           NODE       NOMINATED NODE   READINESS GATES
+scaletestapp-6c454b7558-mftsw   1/1     Running   0          8m52s   10.244.0.7   minikube   <none>           <none>
+
+
+=== Полная хронология событий, связанных со scaletestapp (кубectl get events) ===
+
+24m         Normal    SuccessfulCreate               replicaset/scaletestapp-f4b4fb46b          Created pod: scaletesta
+pp-f4b4fb46b-thkd9
+24m         Normal    Scheduled                      pod/scaletestapp-f4b4fb46b-thkd9           Successfully assigned d
+efault/scaletestapp-f4b4fb46b-thkd9 to minikube
+24m         Normal    ScalingReplicaSet              deployment/scaletestapp                    Scaled up replica set s
+caletestapp-f4b4fb46b from 0 to 1
+23m         Normal    Pulling                        pod/scaletestapp-f4b4fb46b-thkd9           Pulling image "ghcr.io/
+yandex-practicum/scaletestapp:sha256-eff20ae3ae2d596375f9ed6d612a78d149a35a66cd2907ea90d7175ca918c993.sig"
+23m         Warning   Failed                         pod/scaletestapp-f4b4fb46b-thkd9           Error: ErrImagePull
+23m         Warning   Failed                         pod/scaletestapp-f4b4fb46b-thkd9           Failed to pull image "g
+hcr.io/yandex-practicum/scaletestapp:sha256-eff20ae3ae2d596375f9ed6d612a78d149a35a66cd2907ea90d7175ca918c993.sig": unsu
+pported media type application/vnd.dev.cosign.simplesigning.v1+json
+23m         Warning   Failed                         pod/scaletestapp-f4b4fb46b-thkd9           Error: ImagePullBackOff
+23m         Normal    BackOff                        pod/scaletestapp-f4b4fb46b-thkd9           Back-off pulling image 
+"ghcr.io/yandex-practicum/scaletestapp:sha256-eff20ae3ae2d596375f9ed6d612a78d149a35a66cd2907ea90d7175ca918c993.sig"
+23m         Normal    SuccessfulCreate               replicaset/scaletestapp-6c454b7558         Created pod: scaletesta
+pp-6c454b7558-dd8p6
+23m         Normal    ScalingReplicaSet              deployment/scaletestapp                    Scaled up replica set s
+caletestapp-6c454b7558 from 0 to 1
+23m         Normal    Scheduled                      pod/scaletestapp-6c454b7558-dd8p6          Successfully assigned d
+efault/scaletestapp-6c454b7558-dd8p6 to minikube
+23m         Normal    Pulling                        pod/scaletestapp-6c454b7558-dd8p6          Pulling image "ghcr.io/
+yandex-practicum/scaletestapp@sha256:eff20ae3ae2d596375f9ed6d612a78d149a35a66cd2907ea90d7175ca918c993"
+23m         Normal    Pulled                         pod/scaletestapp-6c454b7558-dd8p6          Successfully pulled ima
+ge "ghcr.io/yandex-practicum/scaletestapp@sha256:eff20ae3ae2d596375f9ed6d612a78d149a35a66cd2907ea90d7175ca918c993" in 1
+.201s (1.201s including waiting). Image size: 10812525 bytes.
+23m         Normal    ScalingReplicaSet              deployment/scaletestapp                    Scaled down replica set
+ scaletestapp-f4b4fb46b from 1 to 0
+23m         Normal    SuccessfulDelete               replicaset/scaletestapp-f4b4fb46b          Deleted pod: scaletesta
+pp-f4b4fb46b-thkd9
+22m         Warning   FailedGetResourceMetric        horizontalpodautoscaler/scaletestapp-hpa   failed to get memory ut
+ilization: unable to get metrics for resource memory: no metrics returned from resource metrics API
+22m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/scaletestapp-hpa   invalid metrics (1 inva
+lid out of 1), first error is: failed to get memory resource metric value: failed to get memory utilization: unable to 
+get metrics for resource memory: no metrics returned from resource metrics API
+8m52s       Normal    Scheduled                      pod/scaletestapp-6c454b7558-mftsw          Successfully assigned d
+efault/scaletestapp-6c454b7558-mftsw to minikube
+8m52s       Normal    SuccessfulCreate               replicaset/scaletestapp-6c454b7558         Created pod: scaletesta
+pp-6c454b7558-mftsw
+8m52s       Normal    ScalingReplicaSet              deployment/scaletestapp                    Scaled up replica set s
+caletestapp-6c454b7558 from 1 to 2
+8m52s       Normal    Pulled                         pod/scaletestapp-6c454b7558-mftsw          Container image "ghcr.i
+o/yandex-practicum/scaletestapp@sha256:eff20ae3ae2d596375f9ed6d612a78d149a35a66cd2907ea90d7175ca918c993" already presen
+t on machine and can be accessed by the pod
+8m52s       Normal    SuccessfulRescale              horizontalpodautoscaler/scaletestapp-hpa   New size: 2; reason: me
+mory resource utilization (percentage of request) above target
+8m51s       Normal    Created                        pod/scaletestapp-6c454b7558-mftsw          Container created
+8m51s       Normal    Started                        pod/scaletestapp-6c454b7558-mftsw          Container started
+8m45s       Warning   BackOff                        pod/scaletestapp-6c454b7558-dd8p6          Back-off restarting fai
+led container scaletestapp in pod scaletestapp-6c454b7558-dd8p6_default(2a4584be-643f-4d28-8c28-03c2bc09ab50)
+8m32s       Normal    Pulled                         pod/scaletestapp-6c454b7558-dd8p6          Container image "ghcr.i
+o/yandex-practicum/scaletestapp@sha256:eff20ae3ae2d596375f9ed6d612a78d149a35a66cd2907ea90d7175ca918c993" already presen
+t on machine and can be accessed by the pod
+8m32s       Normal    Started                        pod/scaletestapp-6c454b7558-dd8p6          Container started
+8m32s       Normal    Created                        pod/scaletestapp-6c454b7558-dd8p6          Container created
+2m7s        Normal    SuccessfulDelete               replicaset/scaletestapp-6c454b7558         Deleted pod: scaletesta
+pp-6c454b7558-dd8p6
+2m7s        Normal    SuccessfulRescale              horizontalpodautoscaler/scaletestapp-hpa   New size: 1; reason: Al
+l metrics below target
+2m7s        Normal    Killing                        pod/scaletestapp-6c454b7558-dd8p6          Stopping container scal
+etestapp
+2m7s        Normal    ScalingReplicaSet              deployment/scaletestapp                    Scaled down replica set
+ scaletestapp-6c454b7558 from 2 to 1
+
+
+
